@@ -1,0 +1,62 @@
+# Logs #
+########
+npm-debug.log
+
+# Local Installed Packages #
+############################
+node_modules
+
+# Cache #
+#########
+.npm
+npm-cache
+
+# Compiled Files #
+##################
+dist
+devserver/public/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE generated files #
+#######################
+.idea
+#.vscode/
+.history/
+*.history
+.vscode/settings.json
+
+# Other #
+#########
+#package-lock.json
+
+# aws tooling temp files #
+##########
+out.html
+*-parameters.json
+
+# test-generated artifacts #
+############################
+plugins/watts-contentedit/coverage/*
+
+# remote-db-connector config
+.remote-db-conn/password.js
+
+
+.secret
+
+.env
+
+security/*
+
+coverage/*
+
+dbScript
