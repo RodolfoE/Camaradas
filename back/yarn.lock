@@ -1022,6 +1022,11 @@
   dependencies:
     "whatwg-url" "^5.0.0"
 
+"nodemailer@^6.8.0":
+  "integrity" "sha512-EjYvSmHzekz6VNkNd12aUqAco+bOkRe3Of5jVhltqKhEsjw/y0PYPJfp83+s9Wzh1dspYAkUW/YNQ350NATbSQ=="
+  "resolved" "https://registry.npmjs.org/nodemailer/-/nodemailer-6.8.0.tgz"
+  "version" "6.8.0"
+
 "nodemon@^2.0.20":
   "integrity" "sha1-41N952ikkujXTaXFgTywx0hvxwE="
   "resolved" "https://ab-inbev.pkgs.visualstudio.com/GHQ_B2B_Delta/_packaging/admin-portal-shared-services/npm/registry/nodemon/-/nodemon-2.0.20.tgz"
@@ -1539,6 +1544,11 @@
   "integrity" "sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw="
   "resolved" "https://ab-inbev.pkgs.visualstudio.com/GHQ_B2B_Delta/_packaging/admin-portal-shared-services/npm/registry/unpipe/-/unpipe-1.0.0.tgz"
   "version" "1.0.0"
+
+"urlconcat@^0.0.12":
+  "integrity" "sha512-5Q5fTlO8CxasVpzXuR19ZXR0MeI4oMoShRm0ssrZwtiZMQW01RIUMYtFLgoQcF8P8dkmZhdg0iqX+Q7WFisiLg=="
+  "resolved" "https://registry.npmjs.org/urlconcat/-/urlconcat-0.0.12.tgz"
+  "version" "0.0.12"
 
 "util-deprecate@^1.0.1":
   "integrity" "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="

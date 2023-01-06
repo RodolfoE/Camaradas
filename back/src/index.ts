@@ -38,7 +38,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
 
 
 export const init = () => {
-  const port = 3000;
+  const port = 3001;
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
