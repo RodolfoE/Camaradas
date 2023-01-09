@@ -5,8 +5,8 @@ import jwt from "jsonwebtoken";
 import { getUserByNameOrEmail, saveUser, getUserByUserId, updateUser, updateUserPassword } from './../../fetch';
 import { hashPassword, comparePassword, sendRegistration, sendForgotPassword } from './../../services';
 import { privileges } from '../../helpers/consts'
-import passwordValidator from 'password-validator';
-import emailValidator from 'email-validator';
+import { standardErrorTreatment } from '../../helpers/errorTreatment'
+import { localRegistration, facebookRegistration } from './controller'
 
 const isPasswordValid = async (user: string, plaintextPassword: string, hashedPassword: string) =>
     await comparePassword(plaintextPassword, hashedPassword as string)
@@ -77,51 +77,21 @@ authRouter.post('/newPassword', async (req: any, res: any, next: any) => {
 
 authRouter.post('/register', async (req: any, res: any, next: any) => {
     try{
-        const { username, password, email } = req.body;
-        if ((!username || !email) && await getUserByNameOrEmail(req.pool, username, email)){
-            res.sendStatus(409);
-            return;
+        const { id, username, password, email, stretegy } = req.body;
+        
+        switch(stretegy){
+            case 'facebook':
+                await facebookRegistration(req.pool, { id, username, email, stretegy })    
+                break;
+            default:
+                await localRegistration(req.pool, { username, password, email });
+                break;
         }
-    
-        var schema = new passwordValidator();
-        schema
-            .is().min(8)                                    // Minimum length 8
-            .is().max(100)                                  // Maximum length 100
-        
-        if (process.env.PRODUCTION)
-            schema.has().uppercase()                              // Must have uppercase letters
-                .has().lowercase()                              // Must have lowercase letters
-                .has().digits(2)                                // Must have at least 2 digits
-                .has().not().spaces()                           // Should not have spaces
-                .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
-            
-        if (!emailValidator.validate(email) || !schema.validate(password)){
-            res.sendStatus(401);
-            return;
-        }            
-    
-        const user = {
-            username,
-            password: await hashPassword(password),
-            email
-        }
-    
-        const knownAdmins = process.env.KNOWN_ADMIN?.split(',');
-        const admin = knownAdmins?.indexOf(username);
-        
-        const privilege = admin && admin !== -1 ? knownAdmins?.length && knownAdmins[admin].split(';')[0] || 1 : 2
-        const { user_id } = await saveUser(req.pool, { ...user, active: 0, privilege});
-        
-        const mailToken = jwt.sign({ user_id, privilege }, process.env.JWT_KEY, {
-            algorithm: "HS256",
-            expiresIn: Number(process.env.JWT_REGISTRATION_EXPIRE),
-        });
-    
-        sendRegistration(username, email, mailToken);
-        res.sendStatus(200);    
+
+        res.sendStatus(200);
     } catch (err) {
-        res.sendStatus(500);
-    }    
+        standardErrorTreatment(res, err);
+    }
 })
 
 authRouter.get('/validatetoken/:token', async (req: any, res: any, next: any) => {

@@ -1,5 +1,9 @@
 import { baseFetch } from "../baseFetch";
-
+declare global {
+    interface Window {
+        FB:any;
+    }
+}
 export const newPassword = async (password: string, token: string) => {
     const response = await baseFetch(`/authentication/newPassword`, { password, token }, 'POST')
     if (response.status === 401)
@@ -34,8 +38,56 @@ export const checkAuth = async () => {
         throw new Error('Usuário não Logado');
 };
 
+export const checkFacebookAuth = async () => {
+    return new Promise((resolve: any, reject: any) => {
+        window.FB.getLoginStatus(function(response: any) {
+            const { status } = response;
+            switch(status){
+                case 'connected': 
+                    resolve(response)
+                    break;
+                default:
+                    reject();
+                    break;
+            }
+        });
+    });
+}
+
+export const loginWithFacebook = async () => {
+    return new Promise((resolve: any, reject: any) => {
+        window.FB.login(function(response: any) {
+            switch(response.status){
+                case 'connected':
+                    window.FB.api('/me', async function(response: any) {
+                        try{
+                            const { id, name, email } = response;
+                            await baseFetch('/authentication/register', { id, username: name, email, stretegy: 'facebook' }, 'POST');
+                            resolve();
+                        } catch(err) {
+                            window.FB.logout(() => {})
+                            reject({ message: 'Erro ao logar com Facebook' });
+                        }
+                      });
+                break;
+                default:
+                    window.FB.logout(() => {})
+                    reject({ message: 'Erro ao logar com Facebook' });
+                break;
+            }                
+          }, {scope: 'name, id, email'});
+    });
+}
+
 export const postRegister = async (user: any) => {
     const response = await baseFetch('/authentication/register', user, 'POST')
-    if (response.status !== 200)
-        throw new Error('Erro ao cadastrar novo usuário');
+    if (response.status !== 200){
+        switch (response.status){
+            case 412:
+                throw new Error('A senha deve conter no mínimo 8 caracteres');
+            default:
+            throw new Error('Erro ao cadastrar novo usuário');
+        }
+    }
+        
 }

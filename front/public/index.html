@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <meta name="theme-color" content="#000000" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta
       name="description"
       content="Web site created using create-react-app"
@@ -27,6 +28,29 @@
     <title>React App</title>
   </head>
   <body>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v15.0&appId=529723398926933&autoLogAppEvents=1" nonce="a4ac8aZ3"></script>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '529723398926933',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v15.0'
+        });
+          
+        FB.AppEvents.logPageView();   
+          
+      };
+
+      (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--

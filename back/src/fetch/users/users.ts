@@ -12,8 +12,8 @@ const getUserByUserId = async (pool: any, user_id: string) => {
 const saveUser = async (pool: any, user: any) => {
     const { rows } = await pool.query(`
     INSERT INTO public.users
-    (username, "password", privilege, email, active)
-    VALUES('${user.username.toLocaleLowerCase()}', '${user.password}', ${user.privilege}, '${user.email.toLocaleLowerCase()}', '${user.active}')
+    (${user.id ? 'id, ' : ''} username, "password", privilege, email, active, stretegy)
+    VALUES(${user.id ? `${user.id},` : ''}'${user.username.toLocaleLowerCase()}', '${user.password}', ${user.privilege}, '${user.email.toLocaleLowerCase()}', '${user.active}', '${user.streategy || 'local'}')
     RETURNING user_id;`)
     return rows.pop();
 }

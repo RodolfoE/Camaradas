@@ -22,7 +22,7 @@ const sendRegistration = async (username: string, email: any, mailToken) => {
         <p>
             Para confirmar o registro no nosso site, é preciso que você click nesse link abaixo. 
         
-            <a href="${concat(process.env.BASE_URL, '/register', '/' + mailToken )}">Confirmar Registro</a>
+            <a href="${concat(process.env.BASE_URL, '/login/register', '/' + mailToken )}">Confirmar Registro</a>
         
             Caso não tenha sido você, desconsidere a mensagem ou aproveite a oportunidade para espalhar a mensagem da suas ideologias
             e busque por algum artigo que lhe interessa.
@@ -52,7 +52,7 @@ const sendForgotPassword = async (username: string, email: any, mailToken) => {
         <p>
             Clique no link abaixo para alterar sua senha:
         
-            <a href="${concat(process.env.BASE_URL, '/forgotPassword', '/' + mailToken )}">Esqueci Minha Senha</a>
+            <a href="${concat(process.env.BASE_URL, '/login/forgotPassword', '/' + mailToken )}">Esqueci Minha Senha</a>
         
             Caso não tenha sido você, desconsidere a mensagem ou aproveite a oportunidade para espalhar a mensagem da suas ideologias
             e busque por algum artigo que lhe interessa.
