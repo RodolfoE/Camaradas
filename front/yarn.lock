@@ -1651,6 +1651,20 @@
   dependencies:
     "@babel/runtime" "^7.20.6"
 
+"@mui/lab@^5.0.0-alpha.115":
+  "integrity" "sha512-3u9gRiTboC1tj1Vf8Fse1EaIaJaBwE5M/9NTr4Yp/7seFpIFgL5t/2auM+r9mohqzHT6wP6HWvPAB+OZ9q0/yg=="
+  "resolved" "https://registry.npmjs.org/@mui/lab/-/lab-5.0.0-alpha.115.tgz"
+  "version" "5.0.0-alpha.115"
+  dependencies:
+    "@babel/runtime" "^7.20.7"
+    "@mui/base" "5.0.0-alpha.113"
+    "@mui/system" "^5.11.4"
+    "@mui/types" "^7.2.3"
+    "@mui/utils" "^5.11.2"
+    "clsx" "^1.2.1"
+    "prop-types" "^15.8.1"
+    "react-is" "^18.2.0"
+
 "@mui/material@^5.0.0", "@mui/material@^5.11.4":
   "integrity" "sha512-ZL/czK9ynrQJ6uyDwQgK+j7m1iKA1XKPON+rEPupwAu/bJ1XJxD+H/H2bkMM8UpOkzaucx/WuMbJJGQ60l7gBg=="
   "resolved" "https://registry.npmjs.org/@mui/material/-/material-5.11.4.tgz"
@@ -8321,17 +8335,17 @@
   "resolved" "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   "version" "1.5.1"
 
-"qs@~6.5.2":
-  "integrity" "sha1-Ou7/yRln7241wOSI70b7KWq3aq0="
-  "resolved" "https://ab-inbev.pkgs.visualstudio.com/GHQ_B2B_Delta/_packaging/admin-portal-shared-services/npm/registry/qs/-/qs-6.5.3.tgz"
-  "version" "6.5.3"
-
-"qs@6.11.0":
+"qs@^6.9.4", "qs@6.11.0":
   "integrity" "sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q=="
   "resolved" "https://registry.npmjs.org/qs/-/qs-6.11.0.tgz"
   "version" "6.11.0"
   dependencies:
     "side-channel" "^1.0.4"
+
+"qs@~6.5.2":
+  "integrity" "sha1-Ou7/yRln7241wOSI70b7KWq3aq0="
+  "resolved" "https://ab-inbev.pkgs.visualstudio.com/GHQ_B2B_Delta/_packaging/admin-portal-shared-services/npm/registry/qs/-/qs-6.5.3.tgz"
+  "version" "6.5.3"
 
 "querystringify@^2.1.1":
   "integrity" "sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ=="
@@ -9999,6 +10013,18 @@
   dependencies:
     "querystringify" "^2.1.1"
     "requires-port" "^1.0.0"
+
+"urlcat@^3.0.0":
+  "integrity" "sha512-SSXrIzInzKdWjBfm5iOrPfO6E5Nt0aFs5PTZCauxJTjJE3qhfePAWz8tjGm7dnWMYIAdPGjio51aakunyZHMXQ=="
+  "resolved" "https://registry.npmjs.org/urlcat/-/urlcat-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "qs" "^6.9.4"
+
+"urlconcat@^0.0.12":
+  "integrity" "sha512-5Q5fTlO8CxasVpzXuR19ZXR0MeI4oMoShRm0ssrZwtiZMQW01RIUMYtFLgoQcF8P8dkmZhdg0iqX+Q7WFisiLg=="
+  "resolved" "https://registry.npmjs.org/urlconcat/-/urlconcat-0.0.12.tgz"
+  "version" "0.0.12"
 
 "use-sync-external-store@^1.0.0":
   "integrity" "sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA=="

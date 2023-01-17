@@ -30,12 +30,14 @@ export const postLogin = async (username: string, password: string) => {
         default:
             break;
     }
+    return await response.json();
 }
 
 export const checkAuth = async () => {
     const response = await baseFetch('/authentication/checkAuth', undefined, 'GET')
     if (response.status !== 200)
         throw new Error('Usuário não Logado');
+    return await response.json();
 };
 
 export const checkFacebookAuth = async () => {

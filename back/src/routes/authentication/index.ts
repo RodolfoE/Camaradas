@@ -44,7 +44,7 @@ authRouter.post('/login', async function(req: any, res: any, next: any) {
 
 	res.cookie("token", token, { maxAge: Number(process.env.JWT_EXPIRE) * 1000 })
     res.cookie("refreshToken", refreshToken, { maxAge: Number(process.env.JWT_REFRESH_EXPIRE) * 1000 })
-	res.sendStatus(200)
+	res.send({ ...fetchedUser, password: ''});
 });
 
 authRouter.get('/forgotPassword/:email', async (req: any, res: any, next: any) => {
@@ -151,6 +151,10 @@ const hasPermission = (permissionLevel: number) => (req: any, res: any, next: an
     next();
 }
 
-authRouter.get('/checkAuth', isAuthenticated, (req: any, res: any, next: any) => res.sendStatus(200))
+authRouter.get('/checkAuth', isAuthenticated, (req: any, res: any, next: any) => {
+    const { refreshToken } = req.cookies || req.header;
+    const { user_id, privilege, username, email } = jwt.decode(refreshToken, process.env.JWT_KEY);
+    res.send({ user_id, privilege, username, email });
+})
 
 export { authRouter, isAuthenticated, hasPermission };

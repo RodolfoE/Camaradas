@@ -9,15 +9,14 @@ import { useParams } from 'react-router-dom';
 import { forgotPassword, newPassword } from './../../fetch/authentication/auth'
 import { sanitizeInput, INPUT_TYPE } from './../../services'
 import { postRegister } from './../../fetch' 
-import { checkAuth, checkFacebookAuth } from '../../fetch/authentication/auth'
 import { Loading } from './../../component/loading/loading'
 import { connect } from 'react-redux'
-import { loginReducer } from '../../redux/userSlice'
+import { startLogin, finishLogin, setUser } from '../../redux/userSlice'
+import LoadingButton from '@mui/lab/LoadingButton';
+import Box from '@mui/material/Box';
 
 
-const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
-
-
+const Login = ({ tokenType, dispatch, isAuthenticated, isFetching, isLoading, user }: any) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState(useParams().token);
@@ -31,13 +30,7 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
 
     const [forgotPasswordToken, setForgotPasswordToken] = useState('');
     const [forgotConfirmPasswordToken, setForgotConfirmPasswordToken] = useState('');
-
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        //checkIsAuth();
-    }, [])
-    
+    let navigate = useNavigate();
 
     const onRegistrar = useCallback(async () => {
         try {
@@ -50,30 +43,27 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
         }
     }, [registerUsername, registerPassword, registerEmail, confirmRegisterPassword])
 
-    let navigate = useNavigate();
     const notify = useCallback(async (msg: string) => {
         toast(msg, { position: "top-center", autoClose: 10000, hideProgressBar: true, type: "warning" });
     }, []);
 
     const login = useCallback(async function (stretegy: string) {
+        dispatch(startLogin());
         try{
             switch(stretegy){
                 case 'facebook':
-                    await loginWithFacebook();
-                    navigate('/');
-                    //dispatch({ TYPE: 'login' });
+                    await loginWithFacebook();                    
                     break;
                 case 'local':
-                    //await postLogin(username, password);
-                    //navigate('/');
-                    dispatch(loginReducer({ username: 'rodolfo' }));
+                    dispatch(setUser(await postLogin(username, password)));
                     break;
             }
-
-            
+            navigate('/');
         } catch (err: any) {
             notify(err.message);
-        }        
+        } finally {
+            dispatch(finishLogin());
+        }
     }, [username, password]);
 
     const onNewPassword = useCallback(async function () {
@@ -127,22 +117,6 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
             <h2>Validando token...</h2>
     }
 
-    const checkIsAuth = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            await Promise.any([
-                checkFacebookAuth(),
-                checkAuth()
-            ]);                  
-            //dispatch(login({ payload: { value: true }}));
-        } catch (error) {
-            //dispatch(login({ payload: { value: true }}));
-            navigate('/');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [])
-
     return <>
     {
         isAuthenticated ? '' :
@@ -162,7 +136,11 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
                 <input type="password" name="loginPassword" id="loginPassword" required onChange={(res: any) => setPassword(res.target.value)}/>
                 <label htmlFor="loginPassword">Senha</label>
             </div>
-            <button className="submit-btn" onClick={login.bind(this, 'local')}>Login</button>
+            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                <LoadingButton classes={ { loading: 'loadingBtnPrimary' } } size="small" color="primary" onClick={login.bind(this, 'local')} loading={isFetching} variant="contained" >
+                    <span>Login</span>
+                </LoadingButton>
+            </Box>
             <a href="#register-pw" className="forgot-pw">Registrar</a>
             <br/><br/>
             <a href="#forgot-pw" className="forgot-pw">Esqueceu a senha?</a>
@@ -179,7 +157,9 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
                     <input type="email" name="forgotEmail" id="forgotEmail" required onChange={(res: any) => setEmail(res.target.value)} />
                     <label htmlFor="forgotEmail">Email</label>
                     </div>
-                    <button className="submit-btn"  onClick={onForgotPassword}>Confirmar</button>
+                    <LoadingButton classes={ { loading: 'loadingBtnPrimary' } } style={{ float: 'right' }} size="small" color="primary" onClick={onForgotPassword} loading={isFetching} variant="contained" >
+                        <span>Confirmar</span>
+                    </LoadingButton>
                 </div>
             </div>
 
@@ -207,25 +187,19 @@ const Login = ({ tokenType, isAuthenticated, dispatch }: any) => {
                         <input type="password" name="regConfPass" id="regConfPass" required onChange={(res: any) => setRegisterConfirmPassword(res.target.value)} />
                         <label htmlFor="regConfPass">Confirmar Senha *</label>
                     </div>
-
-                    <button className="submit-btn" disabled={submitBtnDisabled} onClick={onRegistrar}>Registrar</button>
+                    <LoadingButton disabled={submitBtnDisabled} classes={ { loading: 'loadingBtnPrimary' } } style={{ float: 'right' }} size="small" color="primary" onClick={onRegistrar} loading={isFetching} variant="contained" >
+                        <span>Registrar</span>
+                    </LoadingButton>
                 </div>
             </div>
             <ToastContainer style={{color: 'red'}}/>
             </div> : renderTokenView()
-            }
-            
+            }            
         </div>
     </Loading>
     }
     </>
 }
 
-const mapStateToProps = (value: any) => {
-    console.log(value)
-    return {
-        isAuth: value
-    }
-}
-
+const mapStateToProps = ( { authSlice: { isAuthenticated, isFetching, user } }: any) => ({ isAuthenticated, isFetching, user })
 export default connect(mapStateToProps)(Login)

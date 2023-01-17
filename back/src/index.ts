@@ -5,12 +5,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var config = require('./config/database');
+
 import { authRouter } from './routes/index';
+import { productRouter } from './routes/index';
 var app = express();
 // view engine setup
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 require('dotenv').config();
 
@@ -21,6 +23,8 @@ app.use(async function (req: any, res: any, next: any) {
     next();
 });
 app.use('/authentication', authRouter);
+app.use('/product', productRouter);
+
 // catch 404 and forward to error handler
 app.use(function (req: any, res: any, next: any) {
     next(createError(404));

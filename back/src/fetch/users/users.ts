@@ -8,7 +8,6 @@ const getUserByUserId = async (pool: any, user_id: string) => {
     return rows.pop();
 }
 
-
 const saveUser = async (pool: any, user: any) => {
     const { rows } = await pool.query(`
     INSERT INTO public.users

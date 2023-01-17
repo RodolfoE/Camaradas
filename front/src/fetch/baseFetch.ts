@@ -1,4 +1,6 @@
-export const baseFetch = async (url: string, body: any, type: string) => {
+import urlcat from 'urlcat';
+
+export const baseFetch = async (url: string, body: any, type='GET') => {
     let requestOptions = {};
     
     switch(type.toLocaleLowerCase()){
@@ -8,6 +10,13 @@ export const baseFetch = async (url: string, body: any, type: string) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             };
+        break;
+        case 'get': 
+            requestOptions = {
+                method: 'get',
+                headers: { 'Content-Type': 'application/json' },
+            };
+            url = urlcat(url, body)            
         break;
     }
     
