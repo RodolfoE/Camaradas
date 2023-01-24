@@ -3,4 +3,6 @@ const privileges = [
     { role: 'user', level: 2}
 ]
 
-export { privileges }
+const FILE_PATHS = "./public/images";
+
+export { privileges, FILE_PATHS }

@@ -3,9 +3,14 @@ const getAllProducts = async (pool: any) => {
     return rows;
 }
 
-const getProductWithInstances = async (pool: any, product_id: string) => {
-    const { rows } = await pool.query(`select * from public.product p left join public.instance i on p.product_id = i.product_id where p.product_id=${product_id}`)
-    return rows;
+const getProduct = async (pool: any, product_id: string, WithInstances=true) => {    
+    if (WithInstances)
+        var query = `select * from public.product p left join public.instance i on p.product_id = i.product_id where p.product_id=${product_id}`
+    else 
+        var query = `select * from public.product where product_id=${product_id}`
+    
+    const { rows } = await pool.query(query)
+    return rows.pop();
 }
 
 const saveProduct = async (pool: any, product: any) => {
@@ -17,6 +22,13 @@ const saveProduct = async (pool: any, product: any) => {
     return rows.pop();
 }
 
+const updateProduct = async (pool: any, product: any) => {
+    await pool.query(`
+    UPDATE public.product
+    SET title='${product.title}', value=${product.value}, image_paths='${product.image_paths}'
+    WHERE product_id='${product.product_id}';`)
+}
+
 const saveProductInstance = async (pool: any, product_id: string, productInstance: any) => {
     const { rows } = await pool.query(`
     INSERT INTO public.instance
@@ -26,4 +38,4 @@ const saveProductInstance = async (pool: any, product_id: string, productInstanc
     return rows.pop().instance_id;
 }
 
-export { getAllProducts, getProductWithInstances, saveProduct, saveProductInstance }
+export { getAllProducts, getProduct, saveProduct, saveProductInstance, updateProduct }
