@@ -9,8 +9,8 @@ import { authRouter } from './routes/index';
 import { productRouter } from './routes/index';
 var app = express();
 // view engine setup
-app.use(logger('dev'));
-//app.use(express.json());
+app.use(logger('dev')); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 require('dotenv').config();

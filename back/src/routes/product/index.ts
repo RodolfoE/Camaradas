@@ -1,7 +1,7 @@
 import express from 'express';
 const productRouter = express.Router();
 import { standardErrorTreatment } from '../../helpers/errorTreatment'
-import { getAllProducts, saveProduct, saveProductInstance, updateProduct, getProduct } from './../../fetch';
+import { getAllProducts, saveProduct, saveProductInstance, updateProduct, getProduct, updateProductInstance } from './../../fetch';
 import { FILE_PATHS } from './../../helpers/consts';
 import multer from 'multer';
 import fs from 'fs';
@@ -38,10 +38,10 @@ productRouter.put('/:product_id', async (req: any, res: any, next: any) => {
             throw { customError: true, statusCode: 404}
     
         connect.query('BEGIN');
-        await updateProduct(connect, { title, value, image_paths });
-        const ids = await Promise.all(instances.map(instance => saveProductInstance(connect, product_id, instance)));        
+        await updateProduct(connect, { title, value }, Number(product_id));
+        const ids = await Promise.allSettled(instances.map(async ({ instance_id, specification, quantity, image_paths }) => updateProductInstance(connect, { product_id, instance_id }, { specification: JSON.stringify(specification), quantity, image_paths })));
         connect.query('COMMIT');
-        res.send({ product_id, ids })
+        res.send(200)
     } catch(err) {
         connect.query('ROLLBACK');
         standardErrorTreatment(res, err);
@@ -60,7 +60,7 @@ productRouter.put('/upload/:product_id', upload.single('product_photo'), async (
         const extension = file.originalname.split('.')[file.originalname.split('.').length - 1];
         arrayImagePaths.push(concat(FILE_PATHS, `prod_${product_id}_${arrayImagePaths.length}.${extension}`));
         fs.rename(req.file.path, arrayImagePaths[arrayImagePaths.length -1] , () => {});
-        await updateProduct(connect, { product_id, title, value, image_paths: arrayImagePaths.join(',') });
+        await updateProduct(connect, { product_id, title, value, image_paths: arrayImagePaths.join(',') }, product_id);
         res.send(file)
     } catch(err) {
         connect.query('ROLLBACK');

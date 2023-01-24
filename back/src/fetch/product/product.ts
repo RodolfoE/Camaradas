@@ -1,3 +1,5 @@
+import { baseUpdate } from '../base/EasySql';
+
 const getAllProducts = async (pool: any) => {
     const { rows } = await pool.query(`select p.*, i.instance_id, i.image_paths from public.product p left join public.instance i on p.product_id = i.product_id`)
     return rows;
@@ -22,12 +24,7 @@ const saveProduct = async (pool: any, product: any) => {
     return rows.pop();
 }
 
-const updateProduct = async (pool: any, product: any) => {
-    await pool.query(`
-    UPDATE public.product
-    SET title='${product.title}', value=${product.value}, image_paths='${product.image_paths}'
-    WHERE product_id='${product.product_id}';`)
-}
+const updateProduct = (pool: any, product: any, product_id: number) => baseUpdate(pool, 'public.product', product, { product_id })
 
 const saveProductInstance = async (pool: any, product_id: string, productInstance: any) => {
     const { rows } = await pool.query(`
@@ -38,4 +35,6 @@ const saveProductInstance = async (pool: any, product_id: string, productInstanc
     return rows.pop().instance_id;
 }
 
-export { getAllProducts, getProduct, saveProduct, saveProductInstance, updateProduct }
+const updateProductInstance = (pool: any, primaryKey: any, productInstance: any) => baseUpdate(pool, 'public.instance', productInstance, primaryKey)
+
+export { getAllProducts, getProduct, saveProduct, saveProductInstance, updateProduct, updateProductInstance }

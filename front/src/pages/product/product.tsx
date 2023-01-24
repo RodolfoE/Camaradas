@@ -19,12 +19,8 @@ const Product = ({ tokenType, dispatch, isAuthenticated, isFetching, isLoading, 
   };
     useEffect(() => {
         (async () => {
-            const input = document.querySelector('input[type="file"]') as any
-
-            var data = new FormData()
-            data.append('zebra', input['files'][0])
             //const response = await baseFetch('/product/upload',{ product_id: 1, data }, 'POST')
-            //const response = await baseFetch('/product/upload',{ title: 'aslkdjf', value: 50, instances: [{ specification: { color: 'blue' }, quantity: 5, image_paths: []}, { specification: { color: 'blue' }, quantity: 5, image_paths: []}] }, 'POST')
+            const response = await baseFetch('/product/2',{ title: 'aslkdjf', value: 50, instances: [{ instance_id: 22, specification: { color: 'red' }, quantity: 5, image_paths: []}, { instance_id: 23,specification: { color: 'blue' }, quantity: 5, image_paths: []}] }, 'PUT')
             //const response = await baseFetch('/product ', {});
         })();        
     }, []);

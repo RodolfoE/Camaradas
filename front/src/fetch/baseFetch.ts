@@ -11,6 +11,13 @@ export const baseFetch = async (url: string, body: any, type='GET') => {
                 body: JSON.stringify(body)
             };
         break;
+        case 'put': 
+            requestOptions = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            };
+        break;
         case 'get': 
             requestOptions = {
                 method: 'get',
