@@ -10,10 +10,50 @@ const transForm = (item: any) => {
     return obj.filter(ob => ob) || [];
 }
 
+const isNullOrUndefined = (prop: any) => prop == null || prop == undefined || prop == 'null' || prop == 'undefined' || (typeof prop === 'string' && prop.length == 0);
+
+const getValueOrDefault = (prop: any, typeDefault: any) => {
+    if (!isNullOrUndefined(prop))
+        return prop;
+    switch(typeDefault){
+        case 'string': return ''
+        case 'number': return 0
+    }
+    return typeDefault
+}
+
+const baseInsert = (pool: any, tableName: string, body: any, primaryKey='') => {
+    const keys = Object.keys(body);
+    const names = [];
+    const values = [];
+    for (let i = 0; i < keys.length; i++) {
+        switch (typeof body[keys[i]]) {
+            case 'string':
+                if (!isNullOrUndefined(body[keys[i]])){
+                    names.push(`${keys[i]}`);   
+                    values.push(`'${body[keys[i]]}'`);
+                }                
+            break;
+            case 'number':
+                names.push(`${keys[i]}`);   
+                values.push(`${body[keys[i]]}`);
+            break;
+            case 'object':
+                if (!isNullOrUndefined(body[keys[i]])){
+                    names.push(`${keys[i]}`);   
+                    values.push(`'${JSON.stringify(body[keys[i]])}'`);
+                }                    
+            break;
+        }        
+    }
+    return pool.query(`
+        INSERT INTO ${tableName} (${names.join(',')}) VALUES (${values.join(',')})
+        ${primaryKey ? `RETURNING ${primaryKey};` : ';'}`);
+}
 
 const baseUpdate = (pool: any, tableName: string, body: any, primaryKey: any) => {
-    const itemsInSet = transForm(body);
-    const itemInPrimaryKey = transForm(primaryKey);
+    const [itemsInSet, itemInPrimaryKey] = [transForm(body), transForm(primaryKey)];
+    ;
     if (!itemsInSet || !itemsInSet.length)
         throw { customError: true, statusCode: 404}
 
@@ -23,4 +63,16 @@ const baseUpdate = (pool: any, tableName: string, body: any, primaryKey: any) =>
     WHERE ${itemInPrimaryKey.join(' AND ')};`);
 }
 
-export { baseUpdate }
+const baseSelect = (pool: any, tableName: string, where: any) => {
+    return pool.query(`
+    SELECT * FROM ${tableName}
+    WHERE ${transForm(where).join(' AND ')};`);
+}
+
+const baseDelete = (pool: any, tableName: string, where: any) => {
+    return pool.query(`
+    DELETE FROM ${tableName}
+    WHERE ${transForm(where).join(' AND ')};`);
+}
+
+export { baseUpdate, baseSelect, baseDelete, baseInsert }

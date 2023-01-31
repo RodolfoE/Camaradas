@@ -29,3 +29,8 @@ export const baseFetch = async (url: string, body: any, type='GET') => {
     
     return await fetch(url, requestOptions);
 }
+
+export const baseFetchInJson = async (url: string, body: any, type='GET') => {
+    const response = await baseFetch(url, body, type);
+    return await response.json();
+}

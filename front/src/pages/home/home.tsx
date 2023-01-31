@@ -20,7 +20,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { Loading } from './../../component/loading/loading'
 import { connect } from 'react-redux'
-import Product from '../product/product'
+import { Outlet } from 'react-router-dom'
 
 
 const drawerWidth = 240;
@@ -94,7 +94,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-function MiniDrawer({...props}) {
+function MiniDrawer({isLoading}: any) {
   
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -188,10 +188,9 @@ function MiniDrawer({...props}) {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        <Loading isLoading={false}>
-          <Product />
-        </Loading>
-        
+        <Loading isLoading={isLoading}>
+          <Outlet/>
+        </Loading>        
       </Box>
     </Box>
   );

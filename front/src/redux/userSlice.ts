@@ -4,6 +4,7 @@ import { RootState } from './store'
 interface UserState {
   isAuthenticated?: boolean
   isFetching?: boolean
+  fetchFinished?: boolean
   user? : {
     username: string
     password: string
@@ -16,7 +17,8 @@ interface UserState {
 // Define the initial state using that type
 const initialState: UserState = {
   isAuthenticated: false,
-  isFetching: false
+  isFetching: false,
+  fetchFinished: false
 }
 
 export const authSlice = createSlice({
@@ -28,6 +30,7 @@ export const authSlice = createSlice({
     },
     finishLogin: (state) => {
       state.isFetching = false;
+      state.fetchFinished = true;
     },
     setUser: (state: any, action: any) => {
       state.user = action.payload;

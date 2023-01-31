@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 import { getUserByNameOrEmail, saveUser, getUserByUserId, updateUser, updateUserPassword } from './../../fetch';
 import { hashPassword, comparePassword, sendRegistration, sendForgotPassword } from './../../services';
-import { privileges } from '../../helpers/consts'
 import { standardErrorTreatment } from '../../helpers/errorTreatment'
 import { localRegistration, facebookRegistration } from './controller'
+import { isAuthenticated } from '../base/base'
 
 const isPasswordValid = async (user: string, plaintextPassword: string, hashedPassword: string) =>
     await comparePassword(plaintextPassword, hashedPassword as string)
@@ -120,41 +120,10 @@ authRouter.get('/validatetoken/:token', async (req: any, res: any, next: any) =>
 	res.send({ success: true })
 })
 
-const isAuthenticated = (req: any, res: any, next: any) => {
-    try {
-        const { token, refreshToken } = req.cookies || req.header;
-        if (!token || !jwt.verify(token, process.env.JWT_KEY)){
-            if (jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY)){
-                const { user_id, privilege, username, email } = jwt.decode(refreshToken, process.env.JWT_KEY);
-                const token = jwt.sign({ user_id, privilege, username, email }, process.env.JWT_KEY, {
-                    algorithm: "HS256",
-                    expiresIn: Number(process.env.JWT_EXPIRE),
-                });
-                res.cookie("token", token, { maxAge: Number(process.env.JWT_EXPIRE) * 1000 })
-            } else 
-                res.sendStatus(498)
-        }    
-        next();
-    } catch (err) {
-        res.sendStatus(498)
-    }
-}
-
-const hasPermission = (permissionLevel: number) => (req: any, res: any, next: any) => {
-    const { token } = req.cookies || req.header;
-    const user = jwt.decode(token, process.env.JWT_KEY)
-    const currentUserPrivilege = privileges.find(p => p.role === user.privilege)
-    if (currentUserPrivilege?.level > permissionLevel){
-        res.sendStatus(403)
-        return;
-    }
-    next();
-}
-
 authRouter.get('/checkAuth', isAuthenticated, (req: any, res: any, next: any) => {
     const { refreshToken } = req.cookies || req.header;
     const { user_id, privilege, username, email } = jwt.decode(refreshToken, process.env.JWT_KEY);
     res.send({ user_id, privilege, username, email });
 })
 
-export { authRouter, isAuthenticated, hasPermission };
+export { authRouter, isAuthenticated };

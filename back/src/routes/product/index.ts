@@ -1,7 +1,7 @@
 import express from 'express';
 const productRouter = express.Router();
 import { standardErrorTreatment } from '../../helpers/errorTreatment'
-import { getAllProducts, saveProduct, saveProductInstance, updateProduct, getProduct, updateProductInstance } from './../../fetch';
+import { getAllProducts, saveProduct, saveProductInstance, updateProduct, getProduct, updateProductInstance, getInstanceById, deleteProductInstance } from './../../fetch';
 import { FILE_PATHS } from './../../helpers/consts';
 import multer from 'multer';
 import fs from 'fs';
@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
+/*
 productRouter.post('/', async (req: any, res: any, next: any) => {
     const connect = await req.pool.connect();
     try{
@@ -28,18 +29,24 @@ productRouter.post('/', async (req: any, res: any, next: any) => {
         standardErrorTreatment(res, err);
     }
 });
+*/
 
-productRouter.put('/:product_id', async (req: any, res: any, next: any) => {
+productRouter.put(['/','/:product_id'], async (req: any, res: any, next: any) => {
     const connect = await req.pool.connect();
     try{
-        const { product_id } = req.params;
-        const { title, value, instances, image_paths } = req.body;
-        if (!product_id || !title || !value && !instances.all(ins => ins.instance_id)) 
+        const { title, value, instances } = req.body;
+        if (!title || !value && !instances.all(ins => ins.instance_id)) 
             throw { customError: true, statusCode: 404}
     
         connect.query('BEGIN');
-        await updateProduct(connect, { title, value }, Number(product_id));
-        const ids = await Promise.allSettled(instances.map(async ({ instance_id, specification, quantity, image_paths }) => updateProductInstance(connect, { product_id, instance_id }, { specification: JSON.stringify(specification), quantity, image_paths })));
+        if (!req.params.product_id)
+            var product_id = await saveProduct(connect, { title, value });
+        else {
+            var product_id = req.params.product_id;
+            await updateProduct(connect, { title, value }, Number(product_id))
+            await deleteProductInstance(connect, Number(req.params.product_id))
+        }
+        instances.map(async ({ specification, quantity, image_paths }) => await saveProductInstance(connect, { product_id, specification: specification, quantity, image_paths }))
         connect.query('COMMIT');
         res.send(200)
     } catch(err) {
@@ -48,19 +55,19 @@ productRouter.put('/:product_id', async (req: any, res: any, next: any) => {
     }
 });
 
-productRouter.put('/upload/:product_id', upload.single('product_photo'), async (req: any, res: any, next: any) => {
+productRouter.put('/upload/:product_id/:instance_id', upload.single('product_photo'), async (req: any, res: any, next: any) => {
     const connect = await req.pool.connect();
-    const { product_id } = req.params;
+    const { product_id, instance_id } = req.params;
     try{
         const file = req.file
         if (!file || !product_id) 
             throw { customError: true, statusCode: 404}
-        const { title, value, image_paths } = await getProduct(req.pool, product_id, false)
+        const { image_paths } = await getInstanceById(req.pool, product_id, instance_id);
         const arrayImagePaths = !image_paths ? [] : image_paths.split(',')
         const extension = file.originalname.split('.')[file.originalname.split('.').length - 1];
         arrayImagePaths.push(concat(FILE_PATHS, `prod_${product_id}_${arrayImagePaths.length}.${extension}`));
         fs.rename(req.file.path, arrayImagePaths[arrayImagePaths.length -1] , () => {});
-        await updateProduct(connect, { product_id, title, value, image_paths: arrayImagePaths.join(',') }, product_id);
+        await updateProductInstance(connect, { product_id, instance_id } ,{ image_paths: arrayImagePaths.join(',') });
         res.send(file)
     } catch(err) {
         connect.query('ROLLBACK');
