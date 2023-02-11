@@ -22,7 +22,7 @@ const getValueOrDefault = (prop: any, typeDefault: any) => {
     return typeDefault
 }
 
-const baseInsert = (pool: any, tableName: string, body: any, primaryKey='') => {
+const baseInsert = async (pool: any, tableName: string, body: any, primaryKey='') => {
     const keys = Object.keys(body);
     const names = [];
     const values = [];
@@ -46,9 +46,10 @@ const baseInsert = (pool: any, tableName: string, body: any, primaryKey='') => {
             break;
         }        
     }
-    return pool.query(`
+    const { rows } = await pool.query(`
         INSERT INTO ${tableName} (${names.join(',')}) VALUES (${values.join(',')})
         ${primaryKey ? `RETURNING ${primaryKey};` : ';'}`);
+    return rows.pop();
 }
 
 const baseUpdate = (pool: any, tableName: string, body: any, primaryKey: any) => {

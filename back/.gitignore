@@ -62,3 +62,5 @@ coverage/*
 dbScript
 
 public/images/*
+
+src/public/*

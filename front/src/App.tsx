@@ -8,6 +8,8 @@ import { checkAuth, checkFacebookAuth } from './fetch/authentication/auth'
 import { useNavigate } from "react-router-dom";
 import { Header } from './pages/header/header'
 import Product from './pages/product/crud/product'
+import ProductList from './pages/product/crud/list'
+
 import { connect } from 'react-redux'
 import { startLogin, finishLogin, setUser } from './redux/userSlice'
 
@@ -48,6 +50,7 @@ function App({ dispatch }: any) {
           <Route path='' element={<PrimarySearchAppBar isLoading={isLoading}/>}>
             <Route index path='crud/product' element={<Product/>}/>
             <Route index path='crud/product/:id' element={<Product/>}/>
+            <Route index path='crud/product/list' element={<ProductList/>}/>
           </Route>
         </Routes>
     </BrowserRouter>

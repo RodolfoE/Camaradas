@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 require('dotenv').config();
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')))
 const databasePool = config.getDbPool();
 app.use(async function (req: any, res: any, next: any) {
     req.pool = await databasePool;
@@ -27,7 +27,7 @@ app.use('/product', isAuthenticated, hasPermission(1), productRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req: any, res: any, next: any) {
-    next(createError(404));
+    next(createError(404)); 
 });
 
 

@@ -25,6 +25,13 @@ export const baseFetch = async (url: string, body: any, type='GET') => {
             };
             url = urlcat(url, body)            
         break;
+        case 'delete': 
+            requestOptions = {
+                method: 'delete',
+                headers: { 'Content-Type': 'application/json' },
+            };
+            url = urlcat(url, body)            
+        break;
     }
     
     return await fetch(url, requestOptions);
