@@ -6,13 +6,31 @@ import { useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Accordion from '@mui/material/Accordion';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import AddIcon from '@mui/icons-material/Add';
+import Slider from '@mui/material/Slider';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+import InputLabel from '@mui/material/InputLabel';
 
 
 const Product = ({ tokenType, dispatch, isAuthenticated, isFetching, isLoading, user, fetchFinished }: any) => {
     const navigate = useNavigate()
     const [product, setProduct] = useState([]) as any;
+    const [isExpended, setIsExpended] = useState({}) as any;
+    const [quantityOfProdct, setQuantityOfProdct] = useState(-1) as any;
+    
+
     const uploadPicture = (instance_id: number) => async (e: any) => {
         e.preventDefault();
         var data = new FormData()
@@ -41,8 +59,16 @@ const Product = ({ tokenType, dispatch, isAuthenticated, isFetching, isLoading, 
 
     const refreshProduct = async () => {
         const id = window.location.href.split('/')[window.location.href.split('/').length -1];
-        if (!isNaN(Number(id)))
-            setProduct(await baseFetchInJson(`/product/list/${id}`, {}, 'GET'))
+        if (!isNaN(Number(id))){
+            const products = await baseFetchInJson(`/product/list/${id}`, {}, 'GET');
+            console.log(products.instances)
+            const expended = {} as any;
+            for (let i = 0; i < products.instances.length; i++) expended[products.instances[i].instance_id] = i === 0;
+            setProduct(products)
+            setIsExpended(expended);
+            console.log(expended)
+            setQuantityOfProdct(products.instances.length)
+        }
     }
 
     const putInstance = async (update=false) => {
@@ -78,45 +104,98 @@ const Product = ({ tokenType, dispatch, isAuthenticated, isFetching, isLoading, 
             return ins;
         }))})
     }
-
-    return product && <div>
-        <Card sx={{ minWidth: 275 }}>
+    return <div>
+        <Card sx={{ minWidth: 275, marginBottom: '10px' }}>
             <Box>
-            <CardContent>
-                <Typography sx={{ fontSize: 14, marginBottom: 2 }} color="text.secondary" gutterBottom>
-                    Produto
-                </Typography>
-                <TextField label="Título" variant="outlined" onChange={(vlr) => setProduct({...product, title: vlr.target.value })} value={product.title}/>          
-                <TextField label="Valor" variant="outlined" onChange={(vlr) => setProduct({...product, value: vlr.target.value })} value={product.value && (product.value + '').replace(',', '.') }/>
-                </CardContent>
-            </Box>
-        </Card>        
-
-        <button onClick={() => putInstance()}>Adicionar Produto</button>
-        <button onClick={() => putInstance(true)}>Atualizar</button>
-        <table>
-            <tbody>
-        {
-            product.instances && product.instances.map((instance:any) => {
-                return <tr>
-                    <td>{instance.instance_id}</td>
-                    <td><input type={'text'} onChange={(vlr) => onChange('quantity', vlr.target.value, instance.instance_id)} value={instance.quantity} placeholder={'quantity'}/></td>
-                    <td>
+                <CardContent>
+                    <Typography sx={{ fontSize: 14, marginBottom: 2 }} color="text.secondary" gutterBottom>
+                        Produto
+                    </Typography>
+                    <Box sx={{ display: 'flex' }}>
+                        <TextField  sx={{ marginRight: '6px' }} placeholder='Título' variant="outlined" onChange={(vlr) => setProduct({...product, title: vlr.target.value })} value={product.title}/>          
+                        <TextField placeholder="Valor" variant="outlined" onChange={(vlr) => setProduct({...product, value: vlr.target.value.replace('R$ ', '') })} value={product.value && ('R$ ' + product.value).replace(',', '.') }/>
+                    </Box>
+                    <Box sx={{marginTop: 1}}>
                         {
-                            instance.image_paths && instance.image_paths.split(',').map((path: string) => <img height={50} width={50} src={`/static/images/${path}`} />)
-                        }
-                        <input type={'text'} onChange={(vlr) => onChange('image_paths', vlr.target.value, instance.instance_id)} value={instance.image_paths} placeholder={'image_paths'}/>
-                    </td>
-                    Foto: <input type="file" onChange={uploadPicture(instance.instance_id)}/>
-                    <button onClick={() => deleteInstance(instance.instance_id)}>Deletar</button>
-                </tr>
-            })
-        }
-            </tbody>
-        </table>
-        
+                            product.product_id && <Button variant="contained" sx={{width: '100%'}}  onClick={() => putInstance(true)}><RefreshIcon/></Button>
+                        }                        
+                    </Box>
+                </CardContent>
+            </Box>            
+        </Card>
+
+        <Card sx={{ width: '100%', float: 'right' }}>
+            {
+                quantityOfProdct !== -1 && <Box sx={{margin: '15px'}}>
+                <Chip label={'Total: ' + quantityOfProdct} />
+            </Box>
+            }
+            
+            {
+                product.instances && product.instances.map(function (instance:any, index: number) {
+                    return <Box sx={{margin: '15px'}}>
+                        <Accordion expanded={isExpended[product.instances[index].instance_id]}>
+                                <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon onClick={function () {
+                                            isExpended[product.instances[index].instance_id] = !isExpended[product.instances[index].instance_id]
+                                            setIsExpended(isExpended);
+                                        }}/>}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header">
+                                    
+                                    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                                        <Chip label={instance.instance_id} />
+                                        
+                                        <Button variant="text" component="label">
+                                            <AddAPhotoIcon/><input type="file" onChange={uploadPicture(instance.instance_id)} hidden />
+                                        </Button>
+                                        
+                                    </Stack>
+                                </AccordionSummary>
+
+                                <AccordionDetails sx={{margin: '15px'}}>                                    
+                                    <Typography>
+                                    <Box>
+                                        <Slider
+                                            defaultValue={instance.quantity}
+                                            min={0}
+                                            max={1100}
+                                            onChange={(vlr: any) => { onChange('quantity', vlr.target.value, instance.instance_id)}}
+                                            valueLabelDisplay="on"/>
+                                        </Box>                                
+                                    </Typography>
+                                {
+                                    instance.image_paths && 
+                                    <ImageList sx={{ width: '100%', height: '100%' }} cols={2} rowHeight={164}>
+                                        {instance.image_paths.split(',').map((path: string, idx: Number) => (
+                                            <ImageListItem key={idx + ''}>
+                                            <img
+                                                src={`/static/images/${path}`}
+                                                loading="lazy"
+                                                height={10}
+                                                width={10}
+                                            />
+                                            </ImageListItem>
+                                        ))}
+                                    </ImageList>
+                                }
+                                </AccordionDetails>
+                        
+                        </Accordion>
+                    </Box>
+                })
+            }
+            <Box sx={{margin: 2}}>
+                <Button sx={{width: '100%'}} variant="contained" onClick={() => putInstance()}><AddIcon/></Button>
+            </Box>
+        </Card>
     </div>
 }
 
 const mapStateToProps = ( { authSlice: { isAuthenticated, isFetching, user, fetchFinished } }: any) => ({ isAuthenticated, isFetching, user, fetchFinished })
 export default connect(mapStateToProps)(Product)
+
+/**
+ *                         Foto: <input type="file" onChange={uploadPicture(instance.instance_id)}/>
+                        <button onClick={() => deleteInstance(instance.instance_id)}>Deletar</button>
+ */
